@@ -70,16 +70,16 @@ menu.on('select', function (label) {
     siteconf.load();
    	switch(scelta) {
    	    case '1':
-          creautente(username);
+          creautente(username, nconf.get('email'));
    	    	creahosting(username, domainname);
    	    	creadb(username);
           salvaConfig();  	
    	        break;
    	    case '2':
-          creautente(username);
+          creautente(username, nconf.get('email'));
           creahosting(username, domainname);
           creadb(username);
-   	    	installwp();
+   	    	installwp(username, domainname,nconf.get('email'),nconf.get('wp_user'));
           salvaConfig(); 
    	        break;
    	    case '3':
@@ -106,11 +106,11 @@ function salvaConfig() {
     });
 }
 
-function creautente (user) {
+function creautente (user, email) {
   var password = generatePassword(12,false);
     console.log('creo l\'utente'+ user +' su vesta con password' + password + '...');
-    console.log ('/usr/local/vesta/bin/v-add-user ' + user + ' ' + password + ' ' + nconf.get('email'));
-    exec('/usr/local/vesta/bin/v-add-user ' + user + ' ' + password + ' ' +nconf.get('email'), puts);
+    console.log ('/usr/local/vesta/bin/v-add-user ' + user + ' ' + password + ' ' +email );
+    exec('/usr/local/vesta/bin/v-add-user ' + user + ' ' + password + ' ' +email, puts);
     
     siteconf.set('vesta:username', user);
     siteconf.set('vesta:password', password);
@@ -118,8 +118,9 @@ function creautente (user) {
 } 
 
 function creahosting(user, domain) {
-    console.log('creazione hosting ' + domainname + ' con ip ' +nconf.get('ip') );
-    console.log ('/usr/local/vesta/bin/v-add-web-domain ' + user + ' ' + domainname + ' ' + nconf.get('ip'));
+    var ip = nconf.get('ip');
+    console.log('creazione hosting ' + domainname + ' con ip ' + ip);
+    console.log ('/usr/local/vesta/bin/v-add-web-domain ' + user + ' ' + domainname + ' ' + ip);
     exec('/usr/local/vesta/bin/v-add-web-domain ' + user + ' ' + domainname + ' ' +nconf.get('ip'), puts);
 }
 
@@ -133,11 +134,9 @@ function creadb (user) {
     siteconf.set('database:password', password_db); 
 }
 
-function installwp (user,domain) {
+function installwp (user,domain,email,wp_user) {
 	console.log('installa wp');
   var password_wp = generatePassword(12,false);
-  var wp_user = nconf.get('wp_user');
-  var wp_email = nconf.get('email');
   dir='/home/'+user+'/web/'+domain+'/public_html';
   exec('cd '+dir);
   exec('usermod -a -G '+user+' admin');

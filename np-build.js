@@ -127,7 +127,7 @@ function creadb (user) {
  console.log('crea db');
  var password_db = generatePassword(12,false);
  console.log ('/usr/local/vesta/bin/v-add-database ' + user + ' DB U ' + password_db);
- exec('/usr/local/vesta/bin/v-add-database ' + user + ' DB U ' + password, puts);
+ exec('/usr/local/vesta/bin/v-add-database ' + user + ' DB U ' + password_db, puts);
   siteconf.set('database:db', user+'_DB');
   siteconf.set('database:username', user+'_U');
     siteconf.set('database:password', password_db); 

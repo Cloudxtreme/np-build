@@ -1,0 +1,22 @@
+{
+  "name": "np-build",
+  "description": "a delightfully vesta admin scripts",
+  "version": "0.0.2",
+  "dependencies": {
+    "commander": "~2.5.0",
+    "terminal-menu": "~0.3.2",
+    "password-generator": "~0.2.3"
+  },
+  "main": "np-build.js",
+  "devDependencies": {},
+  "scripts": {
+    "test": "np-build.js"
+  },
+  "keywords": [
+    "automation",
+    "hosting",
+    "vestacp"
+  ],
+  "author": "Marco Bonomo",
+  "license": "MIT"
+}

@@ -10,7 +10,7 @@
  var os = require("os");
  var fs = require('fs');
  var generatePassword = require('password-generator');
- var sys = require('sys')
+ var sys = require('util')
  var exec = require('child_process').exec;
  var child;
  var network = require('network');

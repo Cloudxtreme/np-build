@@ -110,7 +110,7 @@ function creautente (user) {
   var password = generatePassword(12,false);
     console.log('creo l\'utente'+ user +' su vesta con password' + password + '...');
     console.log ('/usr/local/vesta/bin/v-add-user ' + user + ' ' + password + ' ' + nconf.get('email'));
-    //exec('/usr/local/vesta/bin/v-add-user ' + user + ' ' + password + ' ' +nconf.get('email'), puts);
+    exec('/usr/local/vesta/bin/v-add-user ' + user + ' ' + password + ' ' +nconf.get('email'), puts);
     
     siteconf.set('vesta:username', user);
     siteconf.set('vesta:password', password);
@@ -120,14 +120,14 @@ function creautente (user) {
 function creahosting(user, domain) {
     console.log('creazione hosting ' + domainname + ' con ip ' +nconf.get('ip') );
     console.log ('/usr/local/vesta/bin/v-add-web-domain ' + user + ' ' + domainname + ' ' + nconf.get('ip'));
-    //exec('/usr/local/vesta/bin/v-add-web-domain ' + user + ' ' + domainname + ' ' +nconf.get('ip'), puts);
+    exec('/usr/local/vesta/bin/v-add-web-domain ' + user + ' ' + domainname + ' ' +nconf.get('ip'), puts);
 }
 
 function creadb (user) {
  console.log('crea db');
  var password_db = generatePassword(12,false);
  console.log ('/usr/local/vesta/bin/v-add-database ' + user + ' DB U ' + password_db);
- //exec('/usr/local/vesta/bin/v-add-database ' + user + ' DB U ' + password, puts);
+ exec('/usr/local/vesta/bin/v-add-database ' + user + ' DB U ' + password, puts);
   siteconf.set('database:db', user+'_DB');
   siteconf.set('database:username', user+'_U');
     siteconf.set('database:password', password_db); 
@@ -136,18 +136,20 @@ function creadb (user) {
 function installwp (user,domain) {
 	console.log('installa wp');
   var password_wp = generatePassword(12,false);
+  var wp_user = nconf.get('wp_user');
+  var wp_email = nconf.get('email');
   dir='/home/'+user+'/web/'+domain+'/public_html';
   exec('cd '+dir);
   exec('usermod -a -G '+user+' admin');
   exec('chmod -R 777 '+dir);
   exec('sudo -u admin wp core download --locale=it_IT');
-  exec('sudo -u admin wp core config --dbname='+user+'_DB --dbuser='+user'_U --dbpass='+password_wp+' --locale=it_IT');
-  exec('sudo -u admin wp core install --url=www.'+domain+' --title='+domain' --admin_user='+nconf.get('wp_user')+' --admin_password='+password_wp+' --admin_email='+nconf.get('email');
+  exec('sudo -u admin wp core config --dbname='+user+'_DB --dbuser='+user+'_U --dbpass='+password_wp+' --locale=it_IT');
+  exec('sudo -u admin wp core install --url=www.'+domain+' --title='+domain+' --admin_user='+wp_user+' --admin_password='+password_wp+' --admin_email='+wp_email);
   exec('sudo -u admin wp rewrite structure /%postname%/');
   exec('sudo -u admin wp plugin install wordpress-seo --activate');
   exec('rm /index.html');
   exec('chmod -R 755 '+dir);
-  exec('chown -R '+user+' '+dir;
+  exec('chown -R '+user+' '+dir);
 
   siteconf.set('wordpress:username', nconf.get('wp_user'));
     siteconf.set('database:password', password_wp); 

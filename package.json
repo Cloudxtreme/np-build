@@ -1,32 +1,28 @@
 {
   "name": "np-build",
-  "version": "0.0.2",
-  "description": "np-build is a script for vesta control panel automation",
+  "version": "0.1.0",
+  "description": "np-build creates vesta control panel hosting",
   "main": "np-build.js",
   "dependencies": {
     "commander": "^2.5.0",
-    "password-generator": "^0.2.3",
     "external-ip": "^0.2.3",
     "externalip": "^0.0.1",
     "nconf": "^0.6.9",
+    "password-generator": "^0.2.3",
     "network": "^0.1.3",
-    "terminal-menu": "^0.3.2",
+    "prompt": "^0.2.14",
     "readline": "^0.0.5",
-    "prompt": "^0.2.14"
+    "terminal-menu": "^0.3.2",
+    "nodemailer": "~1.3.0"
   },
   "devDependencies": {},
   "scripts": {
-    "test": "np-build.js -n test -u test"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/radel/np-build.git"
   },
-  "keywords": [
-    "vesta",
-    "control",
-    "automation"
-  ],
   "author": "Marco Bonomo",
   "license": "MIT",
   "bugs": {

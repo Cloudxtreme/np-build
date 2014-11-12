@@ -1,0 +1,15 @@
+{
+  "vesta": {
+    "username": "test",
+    "password": "k7fko61cWaUW"
+  },
+  "database": {
+    "db": "test_DB",
+    "username": "test_U",
+    "password": "6oqunZi3fRhg"
+  },
+  "wordpress": {
+    "username": "nodopiano",
+    "password": "dKCwD2D8fraP"
+  }
+}

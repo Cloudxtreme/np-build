@@ -11,11 +11,13 @@
  var fs = require('fs');
  var generatePassword = require('password-generator');
  var sys = require('util')
- var exec = require('child_process').exec;
+ var child_process = require('child_process');
  var child;
  var network = require('network');
  var myip = network.get_public_ip(function(err, ip) {
- })
+ });
+var nodemailer = require('nodemailer');
+var transporter = nodemailer.createTransport();
 
  program
  .version('0.0.1')
@@ -78,21 +80,25 @@ menu.on('select', function (label) {
                 creahosting(username, domainname,ip);
                 creadb(username);
           salvaConfig();
-                break;
+          
+            break;
             case '2':
-          creautente(username,email);
-          creahosting(username,domainname,ip);
+          creautente(username,email); 
+	  creahosting(username,domainname,ip);
           creadb(username);
-          installwp(username,domainname,email,wp_user);
+          var passdb = siteconf.get('database:password');
+          installwp(username,domainname,email,wp_user,passdb);
           salvaConfig();
-                break;
+            break;
             case '3':
           creautente(username,email);
           creahosting(username,domainname);
           salvaConfig();
+          
                 break;
         }
 
+	mailConfig(username,domainname,email);
 
 });
 
@@ -110,50 +116,93 @@ function salvaConfig() {
     });
 }
 
+function mailConfig(username,domain,email) {
+  	//console.log('cat '+username+'.json | mail -s \'[dati dominio] '+domain+' su '+os.hostname()+'\' ' +email);
+	transporter.sendMail({
+    from: 'root@'+os.hostname()+'',
+    to: email,
+    subject: '[dati dominio] '+domain+' su '+os.hostname()+'',
+    text: '[dati dominio] '+domain+' su '+os.hostname()+'',
+    attachments: [
+       	{   // utf-8 string as an attachment
+          		path: username+'.json'
+       	}]
+	});
+}
+
+
 function creautente (user, email) {
   var password = generatePassword(12,false);
     console.log('creo l\'utente'+ user +' su vesta con password' + password + '...');
-    console.log ('/usr/local/vesta/bin/v-add-user ' + user + ' ' + password + ' ' +email );
-    exec('/usr/local/vesta/bin/v-add-user ' + user + ' ' + password + ' ' +email, puts);
+    //console.log ('/usr/local/vesta/bin/v-add-user ' + user + ' ' + password + ' ' +email );
+    execSync('/usr/local/vesta/bin/v-add-user ' + user + ' ' + password + ' ' +email, puts);
     siteconf.set('vesta:username', user);
     siteconf.set('vesta:password', password);
 }
 
 function creahosting(user,domain,ip) {
     console.log('creazione hosting ' + domainname + ' con ip ' + ip);
-    console.log ('/usr/local/vesta/bin/v-add-web-domain ' + user + ' ' + domainname + ' ' + ip);
-    exec('/usr/local/vesta/bin/v-add-web-domain ' + user + ' ' + domainname + ' ' +ip, puts);
+    //console.log ('/usr/local/vesta/bin/v-add-web-domain ' + user + ' ' + domainname + ' ' + ip);
+    execSync('/usr/local/vesta/bin/v-add-web-domain ' + user + ' ' + domainname + ' ' +ip, puts);
 }
 
 function creadb (user) {
  console.log('crea db');
  var password_db = generatePassword(12,false);
  console.log ('/usr/local/vesta/bin/v-add-database ' + user + ' DB U ' + password_db);
- exec('/usr/local/vesta/bin/v-add-database ' + user + ' DB U ' + password_db, puts);
+ execSync('/usr/local/vesta/bin/v-add-database ' + user + ' DB U ' + password_db, puts);
   siteconf.set('database:db', user+'_DB');
   siteconf.set('database:username', user+'_U');
     siteconf.set('database:password', password_db);
 }
 
-function installwp (user,domain,email,wp_user) {
-        console.log('installa wp');
+function installwp (user,domain,email,wp_user,password_db) {
+  
+  console.log('installa wp');
   var password_wp = generatePassword(12,false);
   dir='/home/'+user+'/web/'+domain+'/public_html';
-  exec('cd '+dir);
-  exec('usermod -a -G '+user+' admin');
-  exec('chmod -R 777 '+dir);
-  exec('sudo -u admin wp core download --locale=it_IT');
-  exec('sudo -u admin wp core config --dbname='+user+'_DB --dbuser='+user+'_U --dbpass='+password_wp+' --locale=it_IT');
-  exec('sudo -u admin wp core install --url=www.'+domain+' --title='+domain+' --admin_user='+wp_user+' --admin_password='+password_wp+' --admin_email='+email);
-  exec('sudo -u admin wp rewrite structure /%postname%/');
-  exec('sudo -u admin wp plugin install wordpress-seo --activate');
-  exec('rm /index.html');
-  exec('chmod -R 755 '+dir);
-  exec('chown -R '+user+' '+dir);
+  //execSync('cd '+dir);
+  execSync('usermod -a -G '+user+' admin');
+  execSync('chmod -R 777 '+dir);
+  console.log('scarico wordpress');
+  execSync('sudo -u admin wp core download --locale=it_IT --path='+dir);
+  console.log('scrivo un file di configurazione');
+  //console.log('sudo -u admin wp core config --dbname='+user+'_DB --dbuser='+user+'_U --dbpass='+password_db+' --locale=it_IT')
+  execSync('sudo -u admin wp core config --dbname='+user+'_DB --dbuser='+user+'_U --dbpass='+password_db+' --locale=it_IT --path='+dir);
+  console.log('installo wordpress e creo le tabelle nel db');
+  //console.log('sudo -u admin wp core install --url=www.'+domain+' --title='+domain+' --admin_user='+wp_user+' --admin_password='+password_wp+' --admin_email='+email+' --path='+dir); 
+  execSync('sudo -u admin wp core install --url=www.'+domain+' --title='+domain+' --admin_user='+wp_user+' --admin_password='+password_wp+' --admin_email='+email+' --path='+dir);
+  console.log('imposto i permalink');
+  execSync('sudo -u admin wp rewrite structure /%postname%/ --path='+dir);
+  console.log('installo i plugin:');
+  console.log('Wordpress-seo');
+  execSync('sudo -u admin wp plugin install wordpress-seo --activate --path='+dir);
+  execSync('rm '+dir+'/index.html');
+  execSync('chmod -R 755 '+dir);
+  execSync('chown -R '+user+' '+dir);
 
-  siteconf.set('wordpress:username', nconf.get('wp_user'));
-    siteconf.set('database:password', password_wp);
+  siteconf.set('wordpress:username', wp_user);
+    siteconf.set('wordpress:password', password_wp);
+  
+}
 
+function execSync(command) {
+// Run the command in a subshell
+child_process.exec(command + ' 2>&1 1>/root/np-build/output && echo done! > /root/np-build/done');
+ 
+// Block the event loop until the command has executed.
+while (!fs.existsSync('/root/np-build/done')) {
+// Do nothing
+}
+ 
+// Read the output
+var output = fs.readFileSync('/root/np-build/output');
+ 
+// Delete temporary files.
+fs.unlinkSync('/root/np-build/output');
+fs.unlinkSync('/root/np-build/done');
+ 
+return output;
 }
 
 function puts(error,stdout,stderr){sys.puts(stdout); }

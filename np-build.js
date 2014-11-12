@@ -27,7 +27,7 @@
 }
 
 if (!(fs.existsSync('./config.json'))) {
- 
+
    console.log('non hai un file di configurazione, lo creo...');
     nconf.use('file', { file: './config.json' });
     nconf.load();
@@ -42,14 +42,18 @@ if (!(fs.existsSync('./config.json'))) {
       }
       console.log('Configuration saved successfully.');
     });
-  } 
+  }
   else {
     nconf.use('file', { file: './config.json' });
   nconf.load();
-    
+  var email = nconf.get('email');
+  var ip = nconf.get('ip');
+  var hostname = nconf.get('hostname');
+  var wp_user  = nconf.get('wp_user');
+  console.log(hostname);
 program.parse(process.argv);
 var username = program.user;
-var domainname = program.domainname; 
+var domainname = program.domainname;
 
 
 var menu = require('terminal-menu')({ width: process.stdout.columns - 4, x: 0, y: 0 });
@@ -68,27 +72,27 @@ menu.on('select', function (label) {
     var scelta = label.substring(0,1);
     siteconf.use('file', { file: username+'.json', dir:'config_web/', search:true });
     siteconf.load();
-   	switch(scelta) {
-   	    case '1':
-          creautente(username, nconf.get('email'));
-   	    	creahosting(username, domainname);
-   	    	creadb(username);
-          salvaConfig();  	
-   	        break;
-   	    case '2':
-          creautente(username, nconf.get('email'));
-          creahosting(username, domainname);
+        switch(scelta) {
+            case '1':
+          creautente(username, email);
+                creahosting(username, domainname,ip);
+                creadb(username);
+          salvaConfig();
+                break;
+            case '2':
+          creautente(username,email);
+          creahosting(username,domainname,ip);
           creadb(username);
-   	    	installwp(username, domainname,nconf.get('email'),nconf.get('wp_user'));
-          salvaConfig(); 
-   	        break;
-   	    case '3':
-          creautente(username);
-          creahosting(username, domainname);
-          salvaConfig(); 
-   	    	break;
-   	}
-    
+          installwp(username,domainname,email,wp_user);
+          salvaConfig();
+                break;
+            case '3':
+          creautente(username,email);
+          creahosting(username,domainname);
+          salvaConfig();
+                break;
+        }
+
 
 });
 
@@ -111,17 +115,14 @@ function creautente (user, email) {
     console.log('creo l\'utente'+ user +' su vesta con password' + password + '...');
     console.log ('/usr/local/vesta/bin/v-add-user ' + user + ' ' + password + ' ' +email );
     exec('/usr/local/vesta/bin/v-add-user ' + user + ' ' + password + ' ' +email, puts);
-    
     siteconf.set('vesta:username', user);
     siteconf.set('vesta:password', password);
-    
-} 
+}
 
-function creahosting(user, domain) {
-    var ip = nconf.get('ip');
+function creahosting(user,domain,ip) {
     console.log('creazione hosting ' + domainname + ' con ip ' + ip);
     console.log ('/usr/local/vesta/bin/v-add-web-domain ' + user + ' ' + domainname + ' ' + ip);
-    exec('/usr/local/vesta/bin/v-add-web-domain ' + user + ' ' + domainname + ' ' +nconf.get('ip'), puts);
+    exec('/usr/local/vesta/bin/v-add-web-domain ' + user + ' ' + domainname + ' ' +ip, puts);
 }
 
 function creadb (user) {
@@ -131,11 +132,11 @@ function creadb (user) {
  exec('/usr/local/vesta/bin/v-add-database ' + user + ' DB U ' + password_db, puts);
   siteconf.set('database:db', user+'_DB');
   siteconf.set('database:username', user+'_U');
-    siteconf.set('database:password', password_db); 
+    siteconf.set('database:password', password_db);
 }
 
 function installwp (user,domain,email,wp_user) {
-	console.log('installa wp');
+        console.log('installa wp');
   var password_wp = generatePassword(12,false);
   dir='/home/'+user+'/web/'+domain+'/public_html';
   exec('cd '+dir);
@@ -143,7 +144,7 @@ function installwp (user,domain,email,wp_user) {
   exec('chmod -R 777 '+dir);
   exec('sudo -u admin wp core download --locale=it_IT');
   exec('sudo -u admin wp core config --dbname='+user+'_DB --dbuser='+user+'_U --dbpass='+password_wp+' --locale=it_IT');
-  exec('sudo -u admin wp core install --url=www.'+domain+' --title='+domain+' --admin_user='+wp_user+' --admin_password='+password_wp+' --admin_email='+wp_email);
+  exec('sudo -u admin wp core install --url=www.'+domain+' --title='+domain+' --admin_user='+wp_user+' --admin_password='+password_wp+' --admin_email='+email);
   exec('sudo -u admin wp rewrite structure /%postname%/');
   exec('sudo -u admin wp plugin install wordpress-seo --activate');
   exec('rm /index.html');
@@ -151,8 +152,8 @@ function installwp (user,domain,email,wp_user) {
   exec('chown -R '+user+' '+dir);
 
   siteconf.set('wordpress:username', nconf.get('wp_user'));
-    siteconf.set('database:password', password_wp); 
-    
+    siteconf.set('database:password', password_wp);
+
 }
 
-function puts(error, stdout, stderr) { sys.puts(stdout) }
+function puts(error,stdout,stderr){sys.puts(stdout); }

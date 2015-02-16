@@ -80,10 +80,10 @@ menu.on('select', function (label) {
                 creahosting(username, domainname,ip);
                 creadb(username);
           salvaConfig();
-          
+
             break;
             case '2':
-          creautente(username,email); 
+          creautente(username,email);
     creahosting(username,domainname,ip);
           creadb(username);
           var passdb = siteconf.get('database:password');
@@ -92,9 +92,9 @@ menu.on('select', function (label) {
             break;
             case '3':
           creautente(username,email);
-          creahosting(username,domainname);
+          creahosting(username,domainname,ip);
           salvaConfig();
-          
+
                 break;
         }
 
@@ -133,7 +133,7 @@ function mailConfig(username,domain,email) {
 
 function creautente (user, email) {
   var password = generatePassword(12,false);
-    console.log('creo l\'utente'+ user +' su vesta con password' + password + '...');
+    console.log('creo l\'utente'+ user +' su vesta con password ' + password + '...');
     //console.log ('/usr/local/vesta/bin/v-add-user ' + user + ' ' + password + ' ' +email );
     execSync('/usr/local/vesta/bin/v-add-user ' + user + ' ' + password + ' ' +email, puts);
     siteconf.set('vesta:username', user);
@@ -157,7 +157,7 @@ function creadb (user) {
 }
 
 function installwp (user,domain,email,wp_user,password_db) {
-  
+
   console.log('installa wp');
   var password_wp = generatePassword(12,false);
   dir='/home/'+user+'/web/'+domain+'/public_html';
@@ -170,7 +170,7 @@ function installwp (user,domain,email,wp_user,password_db) {
   //console.log('sudo -u admin wp core config --dbname='+user+'_DB --dbuser='+user+'_U --dbpass='+password_db+' --locale=it_IT')
   execSync('sudo -u admin wp core config --dbname='+user+'_DB --dbuser='+user+'_U --dbpass='+password_db+' --locale=it_IT --path='+dir);
   console.log('installo wordpress e creo le tabelle nel db');
-  //console.log('sudo -u admin wp core install --url=www.'+domain+' --title='+domain+' --admin_user='+wp_user+' --admin_password='+password_wp+' --admin_email='+email+' --path='+dir); 
+  //console.log('sudo -u admin wp core install --url=www.'+domain+' --title='+domain+' --admin_user='+wp_user+' --admin_password='+password_wp+' --admin_email='+email+' --path='+dir);
   execSync('sudo -u admin wp core install --url=www.'+domain+' --title='+domain+' --admin_user='+wp_user+' --admin_password='+password_wp+' --admin_email='+email+' --path='+dir);
   console.log('imposto i permalink');
   execSync('sudo -u admin wp rewrite structure /%postname%/ --path='+dir);
@@ -183,25 +183,25 @@ function installwp (user,domain,email,wp_user,password_db) {
 
   siteconf.set('wordpress:username', wp_user);
     siteconf.set('wordpress:password', password_wp);
-  
+
 }
 
 function execSync(command) {
 // Run the command in a subshell
 child_process.exec(command + ' 2>&1 1>/root/np-build/output && echo done! > /root/np-build/done');
- 
+
 // Block the event loop until the command has executed.
 while (!fs.existsSync('/root/np-build/done')) {
 // Do nothing
 }
- 
+
 // Read the output
 var output = fs.readFileSync('/root/np-build/output');
- 
+
 // Delete temporary files.
 fs.unlinkSync('/root/np-build/output');
 fs.unlinkSync('/root/np-build/done');
- 
+
 return output;
 }
 

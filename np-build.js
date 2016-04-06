@@ -167,10 +167,10 @@ function installwp (user,domain,email,wp_user,password_db) {
   console.log('scarico wordpress');
   execSync('sudo -u admin wp core download --locale=it_IT --path='+dir);
   console.log('scrivo un file di configurazione');
-  //console.log('sudo -u admin wp core config --dbname='+user+'_DB --dbuser='+user+'_U --dbpass='+password_db+' --locale=it_IT')
+  console.log('sudo -u admin wp core config --dbname='+user+'_DB --dbuser='+user+'_U --dbpass='+password_db+' --locale=it_IT')
   execSync('sudo -u admin wp core config --dbname='+user+'_DB --dbuser='+user+'_U --dbpass='+password_db+' --locale=it_IT --path='+dir);
   console.log('installo wordpress e creo le tabelle nel db');
-  //console.log('sudo -u admin wp core install --url=www.'+domain+' --title='+domain+' --admin_user='+wp_user+' --admin_password='+password_wp+' --admin_email='+email+' --path='+dir);
+  console.log('sudo -u admin wp core install --url=www.'+domain+' --title='+domain+' --admin_user='+wp_user+' --admin_password='+password_wp+' --admin_email='+email+' --path='+dir);
   execSync('sudo -u admin wp core install --url=www.'+domain+' --title='+domain+' --admin_user='+wp_user+' --admin_password='+password_wp+' --admin_email='+email+' --path='+dir);
   console.log('imposto i permalink');
   execSync('sudo -u admin wp rewrite structure /%postname%/ --path='+dir);

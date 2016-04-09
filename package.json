@@ -19,6 +19,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "bin": {
+  "np-build": "np-build.js"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/radel/np-build.git"

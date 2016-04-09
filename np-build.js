@@ -137,7 +137,7 @@ function mailConfig(username,domain,email) {
 function creautente (user, email) {
   var password = generatePassword(12,false);
     console.log('creo l\'utente'+ user +' su vesta con password ' + password + '...');
-    console.log ('sudo -u root /usr/local/vesta/bin/v-add-user ' + user + ' ' + password + ' ' +email );
+    //console.log ('sudo -u root /usr/local/vesta/bin/v-add-user ' + user + ' ' + password + ' ' +email );
     execSync('sudo -u root /usr/local/vesta/bin/v-add-user ' + user + ' ' + password + ' ' +email, {stdio:[0,1,2]});
     siteconf.set('vesta:username', user);
     siteconf.set('vesta:password', password);
@@ -145,14 +145,14 @@ function creautente (user, email) {
 
 function creahosting(user,domain,ip) {
     console.log('creazione hosting ' + domainname + ' con ip ' + ip);
-    console.log ('sudo -u root /usr/local/vesta/bin/v-add-web-domain ' + user + ' ' + domainname + ' ' + ip);
+    //console.log ('sudo -u root /usr/local/vesta/bin/v-add-web-domain ' + user + ' ' + domainname + ' ' + ip);
     execSync('sudo -u root /usr/local/vesta/bin/v-add-web-domain ' + user + ' ' + domainname + ' ' +ip, puts);
 }
 
 function creadb (user) {
  console.log('crea db');
  var password_db = generatePassword(12,false);
- console.log ('sudo -u root /usr/local/vesta/bin/v-add-database ' + user + ' DB U ' + password_db);
+ //console.log ('sudo -u root /usr/local/vesta/bin/v-add-database ' + user + ' DB U ' + password_db);
  execSync('sudo -u root /usr/local/vesta/bin/v-add-database ' + user + ' DB U ' + password_db, puts);
   siteconf.set('database:db', user+'_DB');
   siteconf.set('database:username', user+'_U');
@@ -180,12 +180,14 @@ function installwp (user,domain,email,wp_user,password_db) {
   console.log('installo i plugin:');
   console.log('Wordpress-seo');
   execSync('sudo -u admin wp plugin install wordpress-seo --activate --path='+dir);
+  console.log('CF7');
+  execSync('sudo -u admin wp plugin install contact-form-7 --activate --path='+dir);
   execSync('rm '+dir+'/index.html');
   execSync('sudo -u root  chmod -R 755 '+dir);
   execSync('sudo -u root  chown -R '+user+' '+dir);
 
   siteconf.set('wordpress:username', wp_user);
-    siteconf.set('wordpress:password', password_wp);
+  siteconf.set('wordpress:password', password_wp);
 
 }
 

@@ -14,4 +14,4 @@ This script is intented to be runned as _root_ for now, which is *VERY* bad.
 ### todo
 
 - use npm wp-cli instead of system wp-cli
-- Better asyncronous execution
+- ~~Better asyncronous execution~~

@@ -67,8 +67,9 @@ menu.write('np-build is a tool for vesta cp\n');
 menu.write('-------------------------\n');
 
 menu.add('1 . Crea hosting e database');
-menu.add('2 . Crea hosting, database e install wordpress');
+menu.add('2 . Crea hosting, database e installa WordPress');
 menu.add('3 . Crea soltanto l\'hosting');
+menu.add('4 . Crea Database e installa WordPress su utente esistente');
 menu.add('Quit');
 
 menu.on('select', function (label) {
@@ -77,29 +78,35 @@ menu.on('select', function (label) {
     var scelta = label.substring(0,1);
     siteconf.use('file', { file: username+'.json', dir:'config_web/', search:true });
     siteconf.load();
-        switch(scelta) {
-            case '1':
-          creautente(username, email);
-                creahosting(username, domainname,ip);
-                creadb(username);
-          salvaConfig();
+    switch(scelta) {
+      case '1':
+      creautente(username, email);
+      creahosting(username, domainname,ip);
+      creadb(username);
+      salvaConfig();
 
-            break;
-            case '2':
-          creautente(username,email);
-    creahosting(username,domainname,ip);
-          creadb(username);
-          var passdb = siteconf.get('database:password');
-          installwp(username,domainname,email,wp_user,passdb);
-          salvaConfig();
-            break;
-            case '3':
-          creautente(username,email);
-          creahosting(username,domainname,ip);
-          salvaConfig();
+      break;
+      case '2':
+      creautente(username,email);
+      creahosting(username,domainname,ip);
+      creadb(username);
+      var passdb = siteconf.get('database:password');
+      installwp(username,domainname,email,wp_user,passdb);
+      salvaConfig();
+      break;
+      case '3':
+      creautente(username,email);
+      creahosting(username,domainname,ip);
+      salvaConfig();
 
-                break;
-        }
+      break;
+      case '4':
+      creadb(username);
+      var passdb = siteconf.get('database:password');
+      installwp(username,domainname,email,wp_user,passdb);
+      salvaConfig();
+      break;
+    }
 
   mailConfig(username,domainname,email);
 

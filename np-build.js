@@ -21,7 +21,7 @@ var nodemailer = require('nodemailer');
 var transporter = nodemailer.createTransport();
 
  program
- .version('0.0.1')
+ .version('1.0.1')
  .option('-u, --user [string]', 'crea un utente', 'admin')
  .option('-n, --domainname [string]', 'crea un dominio', os.hostname());
 

@@ -190,8 +190,8 @@ function installwp (user,domain,email,wp_user,password_db) {
   console.log('CF7');
   execSync('sudo -u admin wp plugin install contact-form-7 --activate --path='+dir);
   execSync('rm '+dir+'/index.html');
-  execSync('sudo -u root  chmod -R 755 '+dir);
-  execSync('sudo -u root  chown -R '+user+' '+dir);
+  execSync('sudo -u root  chmod -R 775 '+dir);
+  execSync('sudo -u root  chown -R '+user+'.deploy '+dir);
 
   siteconf.set('wordpress:username', wp_user);
   siteconf.set('wordpress:password', password_wp);
